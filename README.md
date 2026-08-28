@@ -7,4 +7,4 @@ In the upper right corner, you can find :
 - (F) : Toggle freeze (Blue : On / White : Off). While freeze active, the scoreboard won't change until the page is manually refreshed
 - (+) : Add a player
 
-  In addition, you can either click on a table (Table1 for exemple) to add the score of each player in the current table, or click a player (Like Name1) to update previous scores, add a new one or delete the player
+In addition, you can either click on a table (Table1 for exemple) to add the score of each player in the current table, or click a player (Like Name1) to update previous scores, add a new one or delete the player
