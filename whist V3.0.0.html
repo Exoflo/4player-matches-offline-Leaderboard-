@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body onload="load()">
+    <!-- Header -->
+    <div style="display: grid;grid-template-columns: 90% 10%; background-color: rgb(201, 241, 241);">
+        <h2 style="text-align: left;margin-left: 20px;"> Whist sa mère</h2>
+        <div class="align-right">
+            <button class="button" style="background-color: red; color: black;" onclick="random()">R</button>
+            <button id="freezeButton" class="button" style="background-color: cyan; border-color: cyan; color: black;" onclick="toggleFreeze()">F</button>
+            <button class="button" onclick="showAddPlayer()">+</button>
+        </div>
+    </div>
+    <hr>
+
+    <!-- Top 4 container -->
+    <div style="display: grid;grid-template-columns: 20% 60% 20%; margin-top: 20px;margin-bottom: 20px;">
+        <div></div>
+        <div>
+            <h2 id="Table1" style="text-align: center;border: 1px solid gold;background-color: rgb(237, 218, 108);">👑 Table 1 👑</h2>
+            <div style="border: 3px solid gold;display: grid; grid-template-columns: 50% 50%;">
+                <div class="playerbox first " id="Player1" onclick="showEditPlayer('Name1')"> Score | Name1</div>
+                <div class="playerbox second" id="Player2" onclick="showEditPlayer('Name2')"> Score | Name2</div>
+                <div class="playerbox third " id="Player3" onclick="showEditPlayer('Name3')"> Score | Name3</div>
+                <div class="playerbox fourth" id="Player4" onclick="showEditPlayer('Name4')"> Score | Name4</div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- Bottom container -->
+    <div id="BottomContainer" style="display: flex; flex-wrap: wrap;justify-content: center;align-content: center;"></div>
+
+    <!-- Add player popup -->
+     <div id="AddPlayer" class="popup">
+        <p style="line-height: 2;"><i>(Ajoutez un ou plusieurs joueurs. Délimitez chaque joueur avec un symbole ';')</i><br></p>
+        <p style="line-height: 3;">Joueur : <input type="text" id="addPlayerInput"><p style="line-height: 3; color: red;" id="addPlayerError"></p></p><br></p>
+        <button onclick="addPlayer()">Ajouter</button> <button onclick="closeAddPlayer()">Annuler</button>
+    </div> 
+
+    <!-- Edit Player popup -->
+     <div id="EditPlayer" class="popup">
+        <p style="line-height: 2;"><i>(Menu d'édition pour le joueur. Editez chaque résultats ou ajoutez en un nouveau.)</i><br></p>
+        <p style="line-height: 2;">Nom : <input type="text" id="editPlayerNameInput"></p>
+        <p style="line-height: 3;" id="editPlayerScores">Scores : </p>
+        <button id="editPlayerButton" onclick="editPlayer()">Ajouter</button> <button id="deletePlayerButton" onclick="deletePlayer()">Suprimer</button> <button onclick="closeEditPlayer()">Annuler</button>
+     </div>
+
+     <!-- Add table score popup -->
+    <div id="AddTableScore" class="popup">
+        <p style="line-height: 2;"><i>(Insérez le score de chaque joueur pour cette manche)</i><br></p>
+        <p style="line-height: 2;" id="Player1Name">Name1 : </p><input type="number" id="Player1Input" style="display: none;">
+        <p style="line-height: 2;" id="Player2Name">Name2 : </p><input type="number" id="Player2Input" style="display: none;">
+        <p style="line-height: 2;" id="Player3Name">Name3 : </p><input type="number" id="Player3Input" style="display: none;">
+        <p style="line-height: 2;" id="Player4Name">Name4 : </p><input type="number" id="Player4Input" style="display: none;">
+        <br><br>
+        <button id="addTableScoreButton">Ajouter</button> <button onclick="closeAddTableScore()">Annuler</button>
+    </div>
+
+<script>
+    // Load Function
+    function load(){
+        // If score do not exist, create it
+        if (!("score" in sessionStorage)){
+            let score = { /*
+                "Alan jfiezji" : [1,1,2,4,5],
+                "Benoit cjiic" : [7,4,3,8,3],
+                "Charles ckcsqk" : [2,2,2,2,2],
+                "Didier kcsqksqc" : [6,7,8,9,9],
+                "Estelle csk" : [8,9,8,9,0],
+                "Florian sqkjcsqk" : [8,9,1,9,9],
+                "Grégoire kcsq" : [-2,9,1,4,9],
+                "Hector kcsqksqc" : [6,7,8,9,9],
+                "Imane csk" : [8,9,8,9,0],
+                "Joëlle sqkjcsqk" : [8,9,1,9,9],
+                "Kevin kcsq" : [-2,9,1,4,9],
+                "Léon kcsq" : [-2,9,1,4,9],
+                "Marie kcsqksqc" : [6,7,8,9,9],
+                "Noé csk" : [8,9,8,9,0],
+                "Odille sqkjcsqk" : [8,9,1,9,9],
+                "Pierre kcsq" : [-2,9,1,4,9],
+                "Quentin cihzoc" : [4,6,2,3,4],
+                "Roger jdzc" : [9,7,8,0,2],
+                "Stéphane dpzde" : [-2,4,9,3,9],
+                "Théo cezkd" : [10,3,3,7,-3],
+                "Ulysse jcizcjiz" : [3,4,2,4,9],
+                "Violette czczk" : [8,9,9,4,9],
+                "Walter jczkz" : [4,9,3,3,4],
+                "Xavier nczjzc" : [3,4,5,3,2],
+                "Yvonne jiezjijiij" : [0,0,0,2,1],
+                "Zoé cnkdnckc" : [-1,-12,0,-2,-4], */
+            };
+
+            
+            // Save in session
+            sessionStorage.setItem("score",JSON.stringify(score));
+        }
+
+        // If Freeze do not exist, create it
+        if (!("Freeze" in sessionStorage)){
+            sessionStorage.setItem("Freeze","on");
+        }
+
+        // If Random do not exist, create it
+        if (!("Random" in sessionStorage)){
+            sessionStorage.setItem("Random","off");
+        }
+    }
+
+    // Enable/Disable Score Freeze
+    function toggleFreeze(){
+        if (!("Freeze" in sessionStorage)){
+            sessionStorage.setItem("Freeze","off");
+        } else{
+            // Fetch toggleFreeze
+            let Freeze = sessionStorage.getItem("Freeze");
+            if (Freeze == "on"){
+                sessionStorage.setItem("Freeze","off");
+                document.getElementById("freezeButton").style.background = "white";
+            } else{
+                sessionStorage.setItem("Freeze","on");
+                document.getElementById("freezeButton").style.background = "cyan";
+            }
+        }
+    }
+
+    function random(){
+        sessionStorage.setItem("Random","on");
+        refresh();
+    }
+
+    // Add Player
+    function showAddPlayer(){
+        document.getElementById("AddPlayer").style.display = "block";
+    }
+    function addPlayer(){
+        // If score do not exist, create it
+        let score = {};
+        if ("score" in sessionStorage){
+            score = JSON.parse(sessionStorage.getItem("score"));
+        } 
+
+        // add name into score
+        let namelist = document.getElementById("addPlayerInput").value.split(";");
+        let error = "";
+        for (var i in namelist){
+            let name = namelist[i].replace(/[^a-zA-Z0-9]/g,"")
+            if (name in score){
+                error += name + ";"
+            } else{
+                score[name] = [];
+            }
+        }
+
+        // Clear popup
+        document.getElementById("addPlayerInput").value = error;
+        if (error == ""){
+            document.getElementById("addPlayerError").innerText = ""
+            document.getElementById("AddPlayer").style.display = "none";
+        } else{
+            document.getElementById("addPlayerError").innerText = "Ces noms existent déjà"
+        }
+
+        // Save in session
+        sessionStorage.setItem("score",JSON.stringify(score));
+        refresh()
+    }
+    function closeAddPlayer(){
+        document.getElementById("addPlayerInput").value = ''
+        document.getElementById("addPlayerError").innerText = ""
+        document.getElementById("AddPlayer").style.display = "none"
+    }
+
+    // Edit Player
+    function showEditPlayer(name){
+        // Fetch score
+        let score = JSON.parse(sessionStorage.getItem("score"));
+        let scores = score[name];
+
+        // Display popup
+        document.getElementById("EditPlayer").style.display = "block";
+
+        // Autocomplete Name
+        document.getElementById("editPlayerNameInput").value = name; 
+        
+        // Autocomplete Scores
+        querry = 'Scores : '
+        for (var i in scores){
+            querry += `<input type="number" value="` + scores[i] + `" style="max-width:60px" id="editPlayerScore` + (i+1) + `">`;
+        }
+        querry += '<input type="number" style="width:auto" id="editPlayerScore' + (scores.length + 1) + '">';
+        document.getElementById("editPlayerScores").innerHTML = querry
+
+        // Edit buttons target
+        document.getElementById("editPlayerButton").setAttribute('onclick','edit("' + name + '")');
+        document.getElementById("deletePlayerButton").setAttribute('onclick','deletePlayer("' + name + '")');
+    }
+    function edit(oldname){
+        // Fetch score
+        let score = JSON.parse(sessionStorage.getItem("score"));
+
+        // Fetch score of player
+        let name = document.getElementById("editPlayerNameInput").value;
+        let basescores =  score[oldname];
+
+        // Fetch updated scores
+        let temp = [];
+        for (var i in basescores){
+            temp.push(document.getElementById("editPlayerScore" + (i+1)).valueAsNumber);
+        }
+
+        let lastipt = document.getElementById("editPlayerScore" + (basescores.length+1)).valueAsNumber;
+        if (!(lastipt == null || lastipt == "" || isNaN(lastipt))){
+            temp.push(lastipt);
+        }
+
+        // If key exist, update. Else, change ckey
+        if (name in score){
+            score[name] = temp;
+            console.log(temp)
+        } else{
+            score[name] = temp;
+            delete score[oldname];
+        }
+
+        // Save score
+        sessionStorage.setItem("score",JSON.stringify(score))
+
+        // Close and refresh
+        document.getElementById("EditPlayer").style.display = "none"
+        if (sessionStorage.getItem("Freeze") == "off"){refresh()}
+    }
+    function deletePlayer(name){
+        // Fetch score
+        let score = JSON.parse(sessionStorage.getItem("score"));
+        delete score[name];
+        if (sessionStorage.getItem("Freeze") == "off"){refresh()}
+    }
+    function closeEditPlayer(){
+        document.getElementById("EditPlayer").style.display = "none"
+    }
+
+    // Add Table Score <p style="line-height: 2;" id="Player1Name">Name1 :<input type="text" id="Player1Input"></p>
+    function showAddTableScore(namelist){
+        // Display popup
+        if(sessionStorage.getItem("Freeze") == "on"){ 
+            document.getElementById("AddTableScore").style.display = "block";
+        }
+
+        // Edit Players name
+        let names = namelist.split(";");
+        document.getElementById("Player1Name").textContent = names[1];
+        document.getElementById("Player2Name").textContent = names[2];
+        document.getElementById("Player3Name").textContent = names[3];
+        document.getElementById("Player4Name").textContent = names[4];
+
+        if(names.length >= 2){document.getElementById("Player1Input").style.display = "block"}
+        if(names.length >= 3){document.getElementById("Player2Input").style.display = "block"}
+        if(names.length >= 4){document.getElementById("Player3Input").style.display = "block"}
+        if(names.length == 5){document.getElementById("Player4Input").style.display = "block"}
+
+        document.getElementById("addTableScoreButton").onclick = function() {addTableScore(namelist)};
+    }
+    function addTableScore(namelist){
+        // Fetch score
+        let score = JSON.parse(sessionStorage.getItem("score"));
+
+        // Fetch score of player
+        let names = namelist.split(";");
+        let name,val
+        for(let i = 1; i < names.length; i++){
+            name = names[i]
+            val = document.getElementById("Player"+i+"Input").valueAsNumber;
+            if(isNaN(val)){val=0}
+            score[name].push(val);
+            console.log(i,val)
+        }
+
+        // Save score
+        sessionStorage.setItem("score",JSON.stringify(score))
+
+        // Mark table and close
+        document.getElementById(names[0]).style.background = "red";
+        closeAddTableScore()
+    }
+    function closeAddTableScore(){
+        document.getElementById("Player1Input").value = "";
+        document.getElementById("Player1Input").style.display = "none";
+        document.getElementById("Player2Input").value = "";
+        document.getElementById("Player2Input").style.display = "none";
+        document.getElementById("Player3Input").value = "";
+        document.getElementById("Player3Input").style.display = "none";
+        document.getElementById("Player4Input").value = "";
+        document.getElementById("Player4Input").style.display = "none";
+        document.getElementById("AddTableScore").style.display = "none";
+    }
+
+    // Dress enought table
+    function refresh(){
+        // Fetch score
+        let score = JSON.parse(sessionStorage.getItem("score"));
+        let Freeze = sessionStorage.getItem("Freeze");
+        let Random = sessionStorage.getItem("Random");
+
+        // Update Freeze Button background
+        if (Freeze == "on"){
+            document.getElementById("freezeButton").style.background = "cyan";
+        } else{
+            document.getElementById("freezeButton").style.background = "white";
+        }
+
+        // Compute leaderboard
+        let leaderboard = [];
+
+        // Sort leaderboard
+        if (Random == "on"){
+            sessionStorage.setItem("Random","off");
+            let keysSet = Object.keys(score);
+            for (let n = keysSet.length; n > 0; n--){
+                let i = Math.floor(Math.random()*n);
+                let k = keysSet[i];
+                leaderboard.push([score[k].reduce((a,b)=>a+b,0),k])
+                keysSet.splice(i,1)
+            }
+        } else {
+            // fill leaderboard then sort
+            for (const k in score){
+                leaderboard.push([score[k].reduce((a,b)=>a+b,0),k]);
+            }
+            leaderboard.sort((a,b)=>b[0]-a[0]);
+        }
+
+        // Fetch bottom container and initialise current table
+        let btmctn = document.getElementById("BottomContainer");
+        let curtable;
+
+        // Populate
+        let querry = ""
+        let i = 0;
+        let table = 2;
+        let tables = []
+        for (var j in leaderboard){
+            tables.push(leaderboard[j][1])
+        }
+
+        // Table 1
+        document.getElementById('Table1').onclick = function() {showAddTableScore("Table1;" + tables.slice(0,4).join(";"))};
+        while (i < Math.min(4,leaderboard.length)){
+            document.getElementById('Player'+(i+1)).innerHTML = leaderboard[i][0] + ' |  ' + leaderboard[i][1];
+            document.getElementById('Player'+(i+1)).setAttribute('onclick','showEditPlayer("' + leaderboard[i][1] + '")')
+            i++
+        }
+
+        // Table 2 -> X
+        // Build bottom container table by table
+        while(i < leaderboard.length){
+            // Create new table if previous full
+            querry += `
+                <div style="margin: 5px;">
+                    <h2 id="Table` + table + `" style="text-align: center;border: 1px solid black;" onclick="showAddTableScore('Table` + table + `;` + tables.slice(i,i+4).join(";") + `')">Table ` + table + `</h2>
+                    <div class="tablebox">`;
+
+            // Fill table
+            for (var j = i; j < Math.min(leaderboard.length,i+4);j++){
+                querry += `<div class="playerbox" id="Player` + (j+1) + `" onclick="showEditPlayer('` + leaderboard[j][1] + `')">` + leaderboard[j][0] + ` | ` + leaderboard[j][1] + `</div>`;
+            }
+
+            querry += '</div></div>'
+
+            // Increment
+            i += 4
+            table += 1
+        }
+
+        // Insert 
+        btmctn.innerHTML = querry
+    }
+
+    // Update scores
+    function update(){
+        // Initialise score and leaderboard
+        let score = JSON.parse(sessionStorage.getItem("score"));
+        let leaderboard = [];
+
+        // Compute total score
+        for (const k in score){
+            leaderboard.push([score[k].reduce((a,b)=>a+b,0),k]);
+        }
+
+        // Sort leaderboard
+        leaderboard.sort((a,b)=>b[0]-a[0]);
+
+        // Update display
+        for (let i = 0; i < leaderboard.length;i++){
+            document.getElementById('Player'+(i+1)).innerHTML = leaderboard[i][0] + ' |  ' + leaderboard[i][1];
+            document.getElementById('Player'+(i+1)).setAttribute('onclick','showEditPlayer("' + leaderboard[i][1] + '")')
+        }
+    }
+</script>
+
+<script> refresh() </script>
+
+</body>
+</html>
