@@ -1,5 +1,5 @@
 # About
-This simple webpage is an interactive leaderboard for 4 player matches (cardgames like Whist, boardgames like 7-Wonders, etc) with point ranking. The leaderboard handles new player, removing player, freezing leaderboard and updating scores
+This simple webpage is an interactive leaderboard for 4 player matches (cardgames like Whist, boardgames like 7-Wonders, etc) with score ranking. The leaderboard handles adding new player, removing player, freezing leaderboard and updating scores
 
 # How to
 In the upper right corner, you can find :
